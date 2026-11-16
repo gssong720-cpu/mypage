@@ -1,5 +1,6 @@
 // 원작: CodePen by pavlovsk "Dancing omg.lol w/ zdog"
 // Zdog는 index.html에서 CDN으로 불러온 전역 변수를 사용합니다.
+// 캔버스는 첫 화면(hero) 영역 크기에 맞춰집니다.
 
 const illoElem = document.querySelector('.illo')
 const sceneSize = 96
@@ -9,7 +10,7 @@ let displaySize
 const illo = new Zdog.Illustration({
   element: illoElem,
   scale: 5.8,
-  resize: 'fullscreen',
+  resize: true,
   onResize(width, height) {
     displaySize = Math.min(width, height)
     this.zoom = Math.floor(displaySize / sceneSize)
@@ -255,8 +256,13 @@ const animate = () => {
   })
   illo.updateGraph()
   illo.renderGraph()
-  requestAnimationFrame(animate)
+  if (!reduceMotion.matches) requestAnimationFrame(animate)
 }
+
+// 기기에서 '동작 줄이기'를 켠 경우 움직이지 않는 그림으로 보여줍니다.
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+reduceMotion.addEventListener('change', () => { if (!reduceMotion.matches) animate() })
+window.addEventListener('resize', () => { if (reduceMotion.matches) animate() })
 
 const start = Date.now()
 animate()
